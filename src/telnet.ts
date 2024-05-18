@@ -1,5 +1,6 @@
 import { createServer } from "net";
 import { io } from "socket.io-client";
+import { config } from "./lib/config";
 
 const server = createServer(async (socket) => {
   // create a utf-8 connection to the server.
@@ -36,6 +37,6 @@ const server = createServer(async (socket) => {
   });
 });
 
-server.listen(6000, async () => {
-  console.log("Telnet server listening on port 6000");
+server.listen(config.get("telnetPort"), async () => {
+  console.log(`Telnet server listening on port ${config.get("telnetPort")}`);
 });

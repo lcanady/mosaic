@@ -13,6 +13,7 @@ import { createHash } from "crypto";
 import { emitter } from "./lib/emitter";
 import { send } from "./lib/broadcast";
 import { config } from "dotenv";
+import { config as conf } from "./lib/config";
 import "./handlers";
 
 config();
@@ -25,10 +26,15 @@ const io = new Server(server);
 
 io.on("connection", async (socket: MuSocket) => {
   let token = {} as JwtPayload;
-  const welcome = await readFile(
-    join(__dirname, "../text/connect.txt"),
-    "utf-8"
-  );
+  let welcome = "";
+  try {
+    welcome = await readFile(join(__dirname, "../text/connect.txt"), "utf-8");
+  } catch (error) {
+    welcome = await readFile(
+      join(__dirname, "../text/connect_default.txt"),
+      "utf-8"
+    );
+  }
 
   socket.on("message", async (msg) => {
     const data = msg;
@@ -66,7 +72,7 @@ io.on("connection", async (socket: MuSocket) => {
   });
 });
 
-server.listen(3000, async () => {
+server.listen(conf.get("mudPort"), async () => {
   await plugins("./commands");
 
   // find all rooms with the tag "room" in their tags lsit.
@@ -86,7 +92,7 @@ server.listen(3000, async () => {
     const hash = createHash("sha512");
 
     const dbobj: DbObj = {
-      tags: "avatar connected superAdmin",
+      tags: "avatar connected superUser",
       dbref: "#2",
       data: {
         name: "Wizard",
@@ -98,7 +104,7 @@ server.listen(3000, async () => {
     await dbobjs.insertOne(dbobj);
   }
 
-  console.log("Server started: listening on *:3000");
+  console.log(`Server started on port ${conf.get("mudPort")}`);
   emitter.emit("startup");
 });
 
