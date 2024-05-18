@@ -8,6 +8,9 @@ function startAndWatchProcess(script: string, name: string) {
       {
         script,
         name,
+        env: {
+          NODE_ENV: "production",
+        },
         interpreter: "ts-node",
       },
       (err, apps) => {
