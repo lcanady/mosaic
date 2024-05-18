@@ -1,5 +1,6 @@
 import { config } from "dotenv";
-import { addCmd } from "../lib";
+import { addCmd, dbobjs } from "../lib";
+import { send } from "../lib/broadcast";
 
 export default () => {
   addCmd({
@@ -9,11 +10,17 @@ export default () => {
     catagory: "admin & building",
     description: "Reboot the server",
     helpfile: "Reboot the server",
-    handler: async () => {
+    handler: async (ctx) => {
       config();
 
-      console.log("Rebooting server...");
-      process.exit(0);
+      const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
+      if (!en) return;
+      if (!en.isSuperUser) return;
+
+      if (process.env.NODE_ENV === "production") {
+        await send({ msg: "Rebooting server" });
+        process.exit(0);
+      }
     },
   });
 };

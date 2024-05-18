@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "scripts": {
     "dev": "set NODE_ENV=dev && concurrently \"ts-node-dev --respawn --transpile-only src/app.ts\" \"ts-node-dev --respawn --transpile-only src/telnet.ts\"",
-    "start": "set NODE_ENV=prod && ts-node src/processManager.ts"
+    "start": "set NODE_ENV=production && ts-node src/processManager.ts"
   },
   "keywords": [
     "MUX",
