@@ -12,10 +12,8 @@ export default () => {
     handler: async () => {
       config();
 
-      if (process.env.NODE_ENV === "production") {
-        console.log("Rebooting server...");
-        process.exit(0);
-      }
+      console.log("Rebooting server...");
+      process.exit(0);
     },
   });
 };
