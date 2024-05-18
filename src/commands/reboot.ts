@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { addCmd, dbobjs } from "../lib";
 import { send } from "../lib/broadcast";
+import { io } from "../app";
 
 export default () => {
   addCmd({
@@ -15,12 +16,9 @@ export default () => {
 
       const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
       if (!en) return;
-      if (!en.isSuperUser) return;
 
-      if (process.env.NODE_ENV === "production") {
-        send({ msg: "Rebooting server" });
-        setTimeout(() => process.exit(0), 1000);
-      }
+      io.emit("message", { msg: "Rebooting server..." });
+      setTimeout(() => process.exit(0), 1000);
     },
   });
 };
