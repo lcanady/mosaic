@@ -18,8 +18,8 @@ export default () => {
       if (!en.isSuperUser) return;
 
       if (process.env.NODE_ENV === "production") {
-        await send({ msg: "Rebooting server" });
-        process.exit(0);
+        send({ msg: "Rebooting server" });
+        setTimeout(() => process.exit(0), 1000);
       }
     },
   });
