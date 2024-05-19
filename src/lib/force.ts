@@ -1,12 +1,12 @@
 import { MuSocket } from "../types/MuSoket";
-import { commandHandler } from "./commandParser";
+import { engine } from "./middlewareEngine";
 
 export const force = (socket: MuSocket, cmd: string) => {
-    const ctx = {
-        socket,
-        msg: cmd,
-        data: {},
-    };
-    
-    commandHandler(ctx);
-}
+  const ctx = {
+    socket,
+    msg: cmd,
+    data: {},
+  };
+
+  engine.execute(ctx);
+};

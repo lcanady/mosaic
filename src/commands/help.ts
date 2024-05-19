@@ -91,7 +91,7 @@ export default () => {
         output += ` %ch${helpFile.name.toUpperCase()}%cn\n\n`;
         output += ` ${helpFile.helpfile}\n`;
         output += "-".repeat(78);
-        send({ target: ctx.socket.id, msg: output });
+        send({ target: ctx.socket.cid, msg: output });
       }
     },
   });

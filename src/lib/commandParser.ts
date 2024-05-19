@@ -18,11 +18,11 @@ export const addCmd = (cmd: Command) => {
 };
 
 engine.use(
-  async (ctx, next) => {
-    const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
-    if (en) {
-    }
-  },
+  // async (ctx, next) => {
+  //   const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
+  //   if (en) {
+  //   }
+  // },
   async (ctx, next) => {
     let avatar;
     if (ctx.socket.cid) {
