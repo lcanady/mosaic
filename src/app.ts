@@ -4,7 +4,6 @@ import { createServer } from "http";
 import { join } from "path";
 import { Server } from "socket.io";
 import { plugins } from "./lib/Plugins";
-import { commandHandler } from "./lib/commandParser";
 import { MuSocket } from "./types/MuSoket";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { dbobjs } from "./lib/database";
@@ -16,6 +15,7 @@ import { config } from "dotenv";
 import { config as conf } from "./lib/config";
 import "./handlers";
 import { LogoutEvent } from "./types/Events";
+import { engine } from "./lib/middlewareEngine";
 
 config();
 const app = express();
@@ -59,7 +59,7 @@ io.on("connection", async (socket: MuSocket) => {
     if (data.data?.quit) return socket.disconnect();
 
     const ctx = { socket, msg: data.msg, data: data.data || {} };
-    if (data.msg) commandHandler(ctx);
+    if (data.msg) engine.execute(ctx);
   });
 
   socket.on("disconnect", async () => {

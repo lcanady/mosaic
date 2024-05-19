@@ -2,6 +2,7 @@
 
 import { addCmd, cmds, dbobjs, tags } from "../lib";
 import { send } from "../lib/broadcast";
+import { config } from "../lib/config";
 import { capString, center, ljust } from "../lib/formatting";
 import { Command } from "../types/Command";
 
@@ -33,7 +34,8 @@ export default () => {
           new Set(helpFiles.map((m) => m.category))
         );
 
-        let output = center(" %ccMosaicMU Help%cn ", 78, "=") + "\n";
+        let output =
+          center(` %cc${config.get("mudName")} Help%cn `, 78, "=") + "\n";
         output +=
           " Topics        Reference               | Topics        Reference" +
           "\n";
@@ -84,7 +86,8 @@ export default () => {
           return;
         }
 
-        let output = center(` %ccMosaicMu Help%cn `, 78, "=") + "\n\n";
+        let output =
+          center(` %cc${config.get("mudName")} Help%cn `, 78, "=") + "\n";
         output += ` %ch${helpFile.name.toUpperCase()}%cn\n\n`;
         output += ` ${helpFile.helpfile}\n`;
         output += "-".repeat(78);

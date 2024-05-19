@@ -25,6 +25,7 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
+    "@digibear/middleware": "^1.0.1",
     "@digibear/tags": "^0.4.0",
     "@types/config": "^3.3.4",
     "@types/jsonwebtoken": "^9.0.6",
