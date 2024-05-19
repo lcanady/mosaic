@@ -45,8 +45,9 @@ export default () => {
       output += center(` %ch${displayName(en, tar)}%cn `, 78, "=") + "\n";
 
       output +=
-        "\n" + getAttr(tar, "description") + "\n\n" ||
-        "You see nothing special.\n\n";
+        "\n" +
+          getAttr(tar, "description", "You see Nothing Special.") +
+          "\n\n" || "You see nothing special.\n\n";
       if (avatars.length > 0) {
         output += center(" %chCharacters%cn ", 78, "-") + "\n";
         avatars.forEach((avatar) => {

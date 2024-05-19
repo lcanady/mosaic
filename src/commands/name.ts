@@ -61,8 +61,8 @@ export default () => {
 
       const takenAlias = await dbobjs.findOne({
         $or: [
-          { "data.name": new RegExp(newAlias, "i") },
-          { "data.alias": new RegExp(newAlias, "i") },
+          { "data.name": new RegExp(`^${newAlias}$`, "i") },
+          { "data.alias": new RegExp(`^${newAlias}$`, "i") },
         ],
       });
 
@@ -78,7 +78,7 @@ export default () => {
       await dbobjs.updateOne({ _id: aliasTarget._id }, { $set: aliasTarget });
       send({
         target: ctx.socket.id,
-        msg: `Done. Alias for %ch${aliasTarget.name}%cn changed.`,
+        msg: `Done. Alias for %ch${aliasTarget.data.name}%cn changed.`,
       });
     },
   });

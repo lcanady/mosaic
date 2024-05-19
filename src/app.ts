@@ -15,6 +15,7 @@ import { send } from "./lib/broadcast";
 import { config } from "dotenv";
 import { config as conf } from "./lib/config";
 import "./handlers";
+import { LogoutEvent } from "./types/Events";
 
 config();
 const app = express();
@@ -67,6 +68,11 @@ io.on("connection", async (socket: MuSocket) => {
       if (en) {
         en.tags = en.tags.replace(/ connected/g, "");
         await dbobjs.updateOne({ _id: en._id }, { $set: en });
+
+        emitter.emit<LogoutEvent>("logout", {
+          dbref: en.dbref,
+          socket: socket,
+        });
       }
     }
   });
@@ -124,3 +130,7 @@ process.on("SIGINT", async () => {
 });
 
 export { app, io };
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+});
