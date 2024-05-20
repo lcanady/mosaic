@@ -16,11 +16,16 @@ import { config as conf } from "./lib/config";
 import "./handlers";
 import { LogoutEvent } from "./types/Events";
 import { engine } from "./lib/middlewareEngine";
+import { createEngine } from "express-preact-views";
 
 config();
 const app = express();
 
 app.use(express.static("public"));
+
+app.set("views", __dirname + "/views");
+app.set("view engine", "jsx");
+app.engine("jsx", createEngine());
 
 const server = createServer(app);
 const io = new Server(server);
@@ -66,7 +71,7 @@ io.on("connection", async (socket: MuSocket) => {
     if (socket.cid) {
       const en = await dbobjs.findOne({ dbref: socket.cid });
       if (en) {
-        en.tags = en.tags.replace(/ connected/g, "");
+        en.tags = en.tags.replace(/ connected/g, "").replace(/\s+/g, " ");
         await dbobjs.updateOne({ _id: en._id }, { $set: en });
 
         emitter.emit<LogoutEvent>("logout", {
@@ -121,7 +126,7 @@ process.on("SIGINT", async () => {
 
   const connected = await dbobjs.find({ tags: /connected/ }).toArray();
   for (const user of connected) {
-    user.tags = user.tags.replace(/ connected/g, "");
+    user.tags = user.tags.replace(/ connected/g, "").replace(/\s+/g, " ");
     await dbobjs.updateOne({ _id: user._id }, { $set: user });
   }
 
