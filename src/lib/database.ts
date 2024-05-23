@@ -7,8 +7,10 @@ import { Board } from "../types/BBoard";
 
 config();
 
-export const { MONGO_URI } = process.env;
-export const db = new MongoClient(MONGO_URI || "").db(conf.get("mudName"));
-export const dbobjs = db.collection<DbObj>("objs");
-export const channels = db.collection<Channel>("channels");
-export const bbs = db.collection<Board>("bbs");
+const { MONGO_URI } = process.env;
+const db = new MongoClient(MONGO_URI || "").db(conf.get("mudName"));
+const dbobjs = db.collection<DbObj>("objs");
+const channels = db.collection<Channel>("channels");
+const bbs = db.collection<Board>("bbs");
+
+export { dbobjs, channels, bbs };
