@@ -170,6 +170,15 @@ server.listen(conf.get("mudPort"), async () => {
     await dbobjs.insertOne(dbobj);
   }
 
+  setInterval(() => {
+    //check for dead sockets and disconnect them.
+    for (const [id, socket] of io.sockets.sockets) {
+      if (socket.connected === false) {
+        socket.disconnect();
+      }
+    }
+  }, 10000);
+
   console.log(`Server started on port ${conf.get("mudPort")}`);
   emitter.emit("startup");
 });
