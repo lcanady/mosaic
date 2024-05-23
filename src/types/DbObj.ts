@@ -2,6 +2,7 @@ import { Document, InsertOneResult, OptionalId, UpdateResult } from "mongodb";
 import { Attribute } from "./Attribute";
 import { AttributeOptions, db, dbobjs, setTags } from "../lib";
 import { tags as tagList } from "../lib/tags";
+import { ChannelEntry } from "./Channels";
 
 export interface DbObjData {
   name?: string;
@@ -9,6 +10,7 @@ export interface DbObjData {
   description?: string;
   location?: string;
   attributes?: Attribute[];
+  channels?: ChannelEntry[];
   [key: string]: any;
 }
 

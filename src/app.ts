@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import { plugins } from "./lib/Plugins";
 import { MuSocket } from "./types/MuSoket";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { dbobjs } from "./lib/database";
+import { channels, dbobjs } from "./lib/database";
 import { DbObj } from "./types/DbObj";
 import { createHash } from "crypto";
 import { emitter } from "./lib/emitter";
@@ -17,15 +17,25 @@ import "./handlers";
 import { LogoutEvent } from "./types/Events";
 import { engine } from "./lib/middlewareEngine";
 import { createEngine } from "express-preact-views";
+import { auth } from "./middleware/auth";
+import bbsRouter from "./routes/bbs";
+import { joinChannels } from "./lib/joinChannels";
 
 config();
 const app = express();
 
 app.use(express.static("public"));
+app.get("/client", (req, res) => {
+  res.render("client");
+});
 
 app.set("views", __dirname + "/views");
 app.set("view engine", "jsx");
 app.engine("jsx", createEngine());
+
+// dynamically load all routes.
+app.use(auth);
+app.use("/api/vi/bbs/", bbsRouter);
 
 const server = createServer(app);
 const io = new Server(server);
@@ -56,15 +66,29 @@ io.on("connection", async (socket: MuSocket) => {
       socket.join(token.dbref);
 
       const en = await dbobjs.findOne({ dbref: token.dbref });
+      socket.cid = en?.dbref;
+
       if (en && en.data.location) {
         socket.join(en.data.location);
       }
+
+      if (en && en.data.channels) {
+        en.data.channels?.forEach((channel) => {
+          // if enactor has joined the channel, join the socket to the channel
+          if (channel.joined && en.tags.includes("connected")) {
+            socket.join(channel.name);
+          }
+        });
+      }
+
+      const ctx = { socket, msg: data.msg, data: data.data || {} };
     }
 
     if (data.data?.quit) return socket.disconnect();
 
     const ctx = { socket, msg: data.msg, data: data.data || {} };
-    if (data.msg) engine.execute(ctx);
+    joinChannels(ctx);
+    if (data.msg && msg !== " ") engine.execute(ctx);
   });
 
   socket.on("disconnect", async () => {
@@ -96,6 +120,37 @@ server.listen(conf.get("mudPort"), async () => {
     };
 
     await dbobjs.insertOne(room);
+  }
+
+  // add some channels.
+  const chans = await channels.find().toArray();
+  if (!chans.length) {
+    await channels.insertMany([
+      {
+        name: "Public",
+        alias: "pub",
+        header: "%ch%cb[Public]%cn",
+        mask: false,
+        title: false,
+      },
+      {
+        name: "Admin",
+        alias: "ad",
+        header: "%ch%cy[Admin]%cn",
+        mask: true,
+        title: true,
+        readLock: "admin+",
+        writeLock: "admin+",
+        joinLock: "admin+",
+      },
+      {
+        name: "Newbie",
+        alias: "new",
+        header: "%ch%cc[Newbie]%cn",
+        mask: false,
+        title: false,
+      },
+    ]);
   }
 
   const userCount = await dbobjs.countDocuments({ tags: /avatar/ });

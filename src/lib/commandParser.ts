@@ -1,7 +1,8 @@
 import { Command } from "../types/Command";
 import { CmdEvent, MoveEvent } from "../types/Events";
 import { send } from "./broadcast";
-import { dbobjs } from "./database";
+import { csend } from "./chennelSend";
+import { channels, dbobjs } from "./database";
 import { emitter } from "./emitter";
 import { force } from "./force";
 import { engine } from "./middlewareEngine";
@@ -19,6 +20,48 @@ export const addCmd = (cmd: Command) => {
 };
 
 engine.use(
+  async (ctx, next) => {
+    const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
+    if (!en) {
+      next();
+      return;
+    }
+
+    const msgParts = ctx.msg?.split(" ");
+
+    const chan = en.data.channels?.find((c) => c.alias === msgParts?.[0]);
+    if (!chan) {
+      next();
+      return;
+    }
+
+    const channel = await channels.findOne({ name: chan.name });
+    if (!channel) {
+      next();
+      return;
+    }
+
+    if (msgParts?.[1].toLowerCase() === "on" && !chan.joined) {
+      ctx.socket.join(channel.name);
+      chan.joined = true;
+      await dbobjs.updateOne({ _id: en._id }, { $set: en });
+      csend(en, channel, `:has joined the channel.`);
+      return;
+    } else if (msgParts && msgParts[1] === "off" && chan.joined) {
+      chan.joined = false;
+      await dbobjs.updateOne({ _id: en._id }, { $set: en });
+      csend(en, channel, `:has left the channel.`);
+      ctx.socket.leave(channel.name);
+      return;
+    } else {
+      if (!chan.joined)
+        return send({
+          target: ctx.socket.cid,
+          msg: "You are not on that channel!",
+        });
+      csend(en, channel, msgParts?.slice(1).join(" ") || "");
+    }
+  },
   async (ctx, next) => {
     const en = await dbobjs.findOne({ dbref: ctx.socket.cid });
     if (!en) {

@@ -6,11 +6,12 @@ export interface Channel {
   writeLock?: string;
   joinLock?: string;
   header?: string;
-  mask?: string;
+  mask?: Boolean;
+  title?: Boolean;
 }
 
 export interface ChannelEntry {
-  channel: string;
+  name: string;
   alias: string;
   mask?: string;
   title?: string;

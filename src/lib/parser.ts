@@ -133,5 +133,38 @@ parser.addSubs(
     before: /%c(\d{1,3})/gi,
     after: "\x1b[38;5;$1m",
     strip: "",
+  }, // italic
+  {
+    before: /%i/g,
+    after: "\x1b[3m",
+    strip: "",
+  }
+);
+
+parser.addSubs(
+  "html",
+  { before: /%r/g, after: "<br />" },
+  { before: /%b/g, after: "&nbsp;", strip: " " },
+  { before: /%t/g, after: "&nbsp;&nbsp;&nbsp;&nbsp;" },
+  //color
+  {
+    before: /%[cx]n/g,
+    after: "<span style='color: inherit'></b></i>",
+    strip: "",
   },
+  { before: /%cx/g, after: "<span style='color: grey'>", strip: "" },
+  { before: /%cr/g, after: "<span style='color: red'>", strip: "" },
+  { before: /%cg/g, after: "<span style='color: green'>", strip: "" },
+  { before: /%cy/g, after: "<span style='color: yellow'>", strip: "" },
+  { before: /%cb/g, after: "<span style='color: blue'>", strip: "" },
+  { before: /%cm/g, after: "<span style='color: magenta'>", strip: "" },
+  { before: /%cc/g, after: "<span style='color: cyan'>", strip: "" },
+  { before: /%cw/g, after: "<span style='color: white'>", strip: "" },
+  { before: /%ch/g, after: "<b>", strip: "" },
+  {
+    before: /%u/g,
+    after: "<span style='border-bottom: 1px solid'>",
+    strip: "",
+  },
+  { before: /%i/g, after: "<span style='font-style: italic;'>", strip: "" }
 );
