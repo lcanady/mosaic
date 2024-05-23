@@ -13,4 +13,4 @@ const dbobjs = db.collection<DbObj>("objs");
 const channels = db.collection<Channel>("channels");
 const bbs = db.collection<Board>("bbs");
 
-export { dbobjs, channels, bbs };
+export { dbobjs, channels, bbs, db };
